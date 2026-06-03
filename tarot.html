@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>心結びタロット</title>
+
+<style>
+body{
+    font-family: sans-serif;
+    color: #6b4a2f;
+    text-align: center;
+    padding: 30px;
+    background-color: #fff7f8;
+    background-image:
+        radial-gradient(circle, rgba(255,182,193,0.35) 2px, transparent 3px),
+        radial-gradient(circle, rgba(212,175,55,0.25) 1px, transparent 2px),
+        linear-gradient(45deg, rgba(255,255,255,0.35) 25%, transparent 25%);
+    background-size: 48px 48px, 90px 90px, 32px 32px;
+}
+
+.sparkle-title{
+    font-size: 28px;
+    animation: blinkSparkle 1.4s infinite alternate;
+    margin-bottom: 5px;
+}
+
+@keyframes blinkSparkle{
+    from{ opacity: 0.35; transform: scale(0.95); }
+    to{ opacity: 1; transform: scale(1.08); }
+}
+
+h1{
+    color:#8b5a3c;
+}
+
+button{
+    background: #ff69b4;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button:hover{
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #ffb6c1;
+}
+
+.card-area{
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.tarot-back{
+    width: 120px;
+    height: 190px;
+    background: linear-gradient(135deg, #8b5a8c, #f7b6d2);
+    border: 3px solid #d4af37;
+    border-radius: 14px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.2);
+    color: white;
+    font-size: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    animation: fadeUp 0.8s ease;
+}
+
+.tarot-back:hover{
+    transform: scale(1.05);
+}
+
+.card{
+    background: white;
+    color:#6b4a2f;
+    margin: 15px auto;
+    padding: 15px;
+    border-radius: 15px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    animation: fadeUp 0.8s ease;
+}
+
+.tarot-img{
+    width: 160px;
+    border-radius: 12px;
+    margin: 10px 0;
+}
+
+@keyframes fadeUp{
+    from{
+        opacity: 0;
+        transform: translateY(25px) scale(0.95);
+    }
+    to{
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+</style>
+
+</head>
+
+<body>
+<div class="sparkle-title">✨ ✨ ✨ ✨ ✨</div>
+<h1>🩷 心結びタロット 🩷</h1>
+
+<p>相手の本音を3枚のカードで鑑定します</p>
+<p>お悩みを入力してください</p>
+<textarea id="userQuestion" placeholder="例：あの人は私をどう思っていますか？" style="width:300px;height:80px;"></textarea><br><br>
+<button onclick="drawTarot()">占う</button>
+
+<div id="result"></div>
+
+<script>
+const cards = [
+"愚者","魔術師","女教皇","女帝","皇帝",
+"教皇","恋人","戦車","力","隠者",
+"運命の輪","正義","吊るされた男","死神",
+"節制","悪魔","塔","星","月",
+"太陽","審判","世界"
+];
+
+const meanings = [
+"相手の現在の気持ち",
+"隠している本音",
+"今後の関係性"
+];
+
+const cardData = {
+
+  "愚者": {
+    "正位置": "自由な恋心・新しい感情",
+    "逆位置": "気まぐれ・不安定"
+  },
+  "魔術師": {
+    "正位置": "積極的な好意・行動したい",
+    "逆位置": "自信不足・空回り"
+  },
+  "女教皇": {
+    "正位置": "静かに想っている",
+    "逆位置": "本音を隠している"
+  },
+  "女帝": {
+    "正位置": "愛情・安心感・優しさ",
+    "逆位置": "甘え・依存"
+  },
+  "皇帝": {
+    "正位置": "真剣な気持ち・責任感",
+    "逆位置": "頑固・支配的"
+  },
+  "教皇": {
+    "正位置": "誠実・安心した関係",
+    "逆位置": "迷い・価値観のズレ"
+  },
+  "恋人": {
+    "正位置": "強い恋愛感情・惹かれている",
+    "逆位置": "気持ちが揺れている"
+  },
+  "戦車": {
+    "正位置": "会いたい・進展したい",
+    "逆位置": "焦り・空回り"
+  },
+  "力": {
+    "正位置": "優しい愛情・信頼",
+    "逆位置": "我慢・不安"
+  },
+  "隠者": {
+    "正位置": "気持ちを整理中",
+    "逆位置": "距離を取りたい"
+  },
+  "運命の輪": {
+    "正位置": "関係が動き出す",
+    "逆位置": "タイミングのズレ"
+  },
+  "正義": {
+    "正位置": "冷静に考えている",
+    "逆位置": "判断できない"
+  },
+  "吊るされた男": {
+    "正位置": "様子を見ている",
+    "逆位置": "身動きできない"
+  },
+  "死神": {
+    "正位置": "気持ちの変化・区切り",
+    "逆位置": "過去を引きずる"
+  },
+  "節制": {
+    "正位置": "穏やかな関係・安心感",
+    "逆位置": "温度差がある"
+  },
+  "悪魔": {
+    "正位置": "強い執着・忘れられない",
+    "逆位置": "依存・苦しい恋"
+  },
+  "塔": {
+    "正位置": "突然の気持ちの変化",
+    "逆位置": "不安定な状況"
+  },
+  "星": {
+    "正位置": "希望・憧れ・癒し",
+    "逆位置": "自信を失っている"
+  },
+  "月": {
+    "正位置": "不安・迷い・曖昧な気持ち",
+    "逆位置": "本音が見え始める"
+  },
+  "太陽": {
+    "正位置": "大きな愛情・安心感",
+    "逆位置": "子どもっぽさ・空回り"
+  },
+  "審判": {
+    "正位置": "復縁・再び気持ちが動く",
+    "逆位置": "過去への迷い"
+  },
+  "世界": {
+    "正位置": "成就・深い絆・満たされる",
+    "逆位置": "もう少し時間が必要"
+  }
+};
+
+const cardImages = {
+  "愚者": "fool.png",
+  "魔術師": "magician.png",
+  "女教皇": "high-priestess.png",
+  "女帝": "empress.png",
+  "皇帝": "emperor.png",
+  "教皇": "hierophant.png",
+  "恋人": "lovers.png",
+  "戦車": "chariot.png",
+  "力": "strength.png",
+  "隠者": "hermit.png",
+  "運命の輪": "wheel.png",
+  "正義": "justice.png",
+  "吊るされた男": "hanged-man.png",
+  "死神": "death.png",
+  "節制": "temperance.png",
+  "悪魔": "devil.png",
+  "塔": "tower.png",
+  "星": "star.png",
+  "月": "moon.png",
+  "太陽": "sun.png",
+  "審判": "judgement.png",
+  "世界": "world.png"
+};
+
+let openedIndexes = [];
+
+async function drawTarot(){
+
+    let shuffled = [...cards].sort(() => 0.5 - Math.random());
+    let drawn = [];
+
+    for(let i=0; i<3; i++){
+        let position = Math.random() > 0.5 ? "正位置" : "逆位置";
+        let cardName = shuffled[i];
+        let meaning = cardData[cardName][position];
+
+        drawn.push({
+            role: meanings[i],
+            card: cardName,
+            position: position,
+            meaning: meaning
+        });
+    }
+
+    window.drawnCards = drawn;
+    openedIndexes = [];
+
+    document.getElementById("result").innerHTML = `
+        <p>カードを1枚ずつクリックしてください</p>
+
+        <div class="card-area">
+            <div id="back0" class="tarot-back" onclick="openCard(0)">?</div>
+            <div id="back1" class="tarot-back" onclick="openCard(1)">?</div>
+            <div id="back2" class="tarot-back" onclick="openCard(2)">?</div>
+        </div>
+
+        <div id="openedCards"></div>
+        <div id="aiResult"></div>
+    `;
+}
+
+async function openCard(index){
+
+    if(openedIndexes.includes(index)){
+        return;
+    }
+
+    openedIndexes.push(index);
+
+    const drawn = window.drawnCards;
+    const card = drawn[index];
+
+    document.getElementById("back" + index).style.visibility = "hidden";
+
+    document.getElementById("openedCards").innerHTML += `
+        <div class="card">
+            <h2>${card.role}</h2>
+            <img class="tarot-img" src="${cardImages[card.card]}" alt="${card.card}">
+            <p>${card.card}</p>
+            <p>${card.position}</p>
+            <p>${card.meaning}</p>
+        </div>
+    `;
+
+    if(openedIndexes.length === 3){
+        await createAIReading(drawn);
+    }
+}
+
+async function createAIReading(drawn){
+
+    document.getElementById("aiResult").innerHTML =
+        `<p>AI鑑定文を作成中です...</p>`;
+
+    const userQuestion = document.getElementById("userQuestion").value;
+
+    const prompt = `
+あなたは「心結びタロット」の優しい癒し系タロット占い師です。
+
+相談内容：
+${userQuestion}
+
+出たカード：
+1枚目：${drawn[0].role} / ${drawn[0].card} / ${drawn[0].position} / ${drawn[0].meaning}
+2枚目：${drawn[1].role} / ${drawn[1].card} / ${drawn[1].position} / ${drawn[1].meaning}
+3枚目：${drawn[2].role} / ${drawn[2].card} / ${drawn[2].position} / ${drawn[2].meaning}
+
+条件：
+・優しい癒し系の文章
+・怖い断定はしない
+・300〜500文字
+・最後に前向きなアドバイスを入れる
+`;
+
+    const response = await fetch("/api/tarot", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        prompt: prompt
+    })
+});
+
+    const data = await response.json();
+
+    let aiText = "";
+
+    if(data.output_text){
+        aiText = data.output_text;
+    } else if(data.output){
+        data.output.forEach(item => {
+            if(item.content){
+                item.content.forEach(content => {
+                    if(content.text){
+                        aiText += content.text;
+                    }
+                });
+            }
+        });
+    }
+
+    if(!aiText){
+        aiText =  data.text ||  "AI鑑定文を取得できませんでした。";
+    }
+
+    document.getElementById("aiResult").innerHTML = `
+        <div class="card">
+            <h2>🩷 AI鑑定結果 🩷</h2>
+            <p style="text-align:left; line-height:1.8;">${aiText}</p>
+        </div>
+    `;
+}
+</script> 
+</body> 
+</html>
