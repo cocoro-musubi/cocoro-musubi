@@ -78,20 +78,40 @@ button:hover{
 }
 
 .card{
-    background: white;
-    color:#6b4a2f;
+    background: #eef9ee;
+    border:2px solid #d8ead8;
+    color:#6b4f3a;
     margin: 15px auto;
     padding: 15px;
     border-radius: 15px;
     width: 300px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    animation: fadeUp 0.8s ease;
+    box-shadow: 0 0 15px rgba(180,220,180,0.5);
+   
+}
+.flip-card{
+    animation: flipOpen 0.8s ease;
+    transform-style: preserve-3d;
+}
+
+@keyframes flipOpen{
+    from{
+        transform: rotateY(180deg) scale(0.9);
+        opacity: 0;
+    }
+    to{
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+    }
 }
 
 .tarot-img{
-    width: 160px;
+    width: 220px;
+    max-width: 100%;
     border-radius: 12px;
     margin: 10px 0;
+}
+.reverse-card{
+    transform: rotate(180deg);
 }
 
 @keyframes fadeUp{
@@ -120,6 +140,19 @@ button:hover{
 <div id="result"></div>
 
 <script>
+const flipSound = new Audio("flip.mp3");
+const magicSound = new Audio("magic.mp3");
+
+function playSound(sound){
+    if(sound){
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+    }
+} 
+
+
+flipSound.volume = 0.4;
+magicSound.volume = 0.5;
 const cards = [
 "愚者","魔術師","女教皇","女帝","皇帝",
 "教皇","恋人","戦車","力","隠者",
@@ -296,28 +329,46 @@ async function openCard(index){
 
     openedIndexes.push(index);
 
+    playSound(flipSound);
+
     const drawn = window.drawnCards;
     const card = drawn[index];
 
     document.getElementById("back" + index).style.visibility = "hidden";
 
-    document.getElementById("openedCards").innerHTML += `
-        <div class="card">
+   document.getElementById("openedCards").insertAdjacentHTML("beforeend", `
+        <div class="card flip-card" id="card${index}">
             <h2>${card.role}</h2>
-            <img class="tarot-img" src="${cardImages[card.card]}" alt="${card.card}">
+            <img
+            style="width:220px;"
+            class="tarot-img ${card.position === '逆位置' ? 'reverse-card' : ''}"
+            src="${cardImages[card.card]}"
+            alt="${card.card}"> 
             <p>${card.card}</p>
             <p>${card.position}</p>
             <p>${card.meaning}</p>
         </div>
-    `;
+    `);
+   setTimeout(() => {
+    document.getElementById("card" + index).classList.remove("flip-card");
+}, 900);
+   if(openedIndexes.length === 3){
+     
 
-    if(openedIndexes.length === 3){
+     setTimeout(() => {
+        playSound(magicSound);
+    }, 3000);
+
+    setTimeout(async () => {
         await createAIReading(drawn);
-    }
+    }, 3000);
+   
+
 }
 
-async function createAIReading(drawn){
-
+}
+    async function createAIReading(drawn){
+   
     document.getElementById("aiResult").innerHTML =
         `<p>AI鑑定文を作成中です...</p>`;
 
