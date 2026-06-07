@@ -34,6 +34,15 @@ h1{
     color:#8b5a3c;
 }
 
+.message{
+  text-align:center;
+  color:#8B5A2B;
+  font-size:18px;
+  margin:20px 0;
+  line-height:1.8;
+  font-weight:bold;
+}
+
 button{
     background: #ff69b4;
     color: white;
@@ -132,9 +141,13 @@ button:hover{
 <div class="sparkle-title">✨ ✨ ✨ ✨ ✨</div>
 <h1>🩷 心結びタロット 🩷</h1>
 
-<p>相手の本音を3枚のカードで鑑定します</p>
-<p>お悩みを入力してください</p>
+<p>あの人の本音を3枚のカードで鑑定します</p>
+<p>今のお気持ちをそっと入力してください</p>
 <textarea id="userQuestion" placeholder="例：あの人は私をどう思っていますか？" style="width:300px;height:80px;"></textarea><br><br>
+<p class="message">
+✨あの人の顔を思い浮かべながら<br>
+心を込めて占うボタンを押してください✨
+</p>
 <button onclick="drawTarot()">占う</button>
 
 <div id="result"></div>
@@ -160,11 +173,10 @@ const cards = [
 "節制","悪魔","塔","星","月",
 "太陽","審判","世界"
 ];
-
 const meanings = [
-"相手の現在の気持ち",
-"隠している本音",
-"今後の関係性"
+  "あの人の今の気持ち",
+  "あの人が秘めている本音",
+  "これからのお二人の流れ"
 ];
 
 const cardData = {
